@@ -1,0 +1,48 @@
+--- sr25519/aura ---
+
+Secret phrase `scrub clown hand shop split betray actress copper wish father gain lonely` is account:
+  Secret seed:      0x1d26ddda6ee7731f42cb446daea902f2e2c5e05a19118687c4e516d5a4c28276
+  Public key (hex): 0x72b4a81818e7c873bd7d399f3613e5518af2804a931a2b3e0187f94a196f9157
+  Account ID:       0x72b4a81818e7c873bd7d399f3613e5518af2804a931a2b3e0187f94a196f9157
+  SS58 Address:     5Ef6yvWpvBpZsZGz6d231Qvw6TxdGiyT67RGZejvPmSmhGah
+
+--- ed25519/gran ---
+
+Secret phrase `scrub clown hand shop split betray actress copper wish father gain lonely` is account:
+  Secret seed:      0x1d26ddda6ee7731f42cb446daea902f2e2c5e05a19118687c4e516d5a4c28276
+  Public key (hex): 0xdaf2cb5ec1083b7a3f5cc7c3989ea095ea2df4d71a65a9d952337d5205b3d7ae
+  Account ID:       0xdaf2cb5ec1083b7a3f5cc7c3989ea095ea2df4d71a65a9d952337d5205b3d7ae
+  SS58 Address:     5H1nRNc8kfGQe1twt2CJtiqdqfJPrSrgFPsCgJpSxvBvvBx2
+
+
+
+--- sr25519/aura ---
+
+Secret phrase `gospel alcohol choose theme nerve rude august metal panther refuse shallow love` is account:
+  Secret seed:      0x81dabe974c69f77e516322388b7c664dd45f61049967eb0e0cd55f00c4ee91a9
+  Public key (hex): 0xa46208762ab16c9a8c9c387194438efc544f4e7594ba9d5dfcf856c8d4ea5f4a
+  Account ID:       0xa46208762ab16c9a8c9c387194438efc544f4e7594ba9d5dfcf856c8d4ea5f4a
+  SS58 Address:     5FnEqDcRWwvngmQNhffXVs9SPzCb77im5KCWi8GzJzZMEkbr
+  
+  --- ed25519/gran ---
+  
+  Secret phrase `gospel alcohol choose theme nerve rude august metal panther refuse shallow love` is account:
+  Secret seed:      0x81dabe974c69f77e516322388b7c664dd45f61049967eb0e0cd55f00c4ee91a9
+  Public key (hex): 0x08e55e6fce90ec8d5632cf553e732b66590b548495db3adcb516da5db5943737
+  Account ID:       0x08e55e6fce90ec8d5632cf553e732b66590b548495db3adcb516da5db5943737
+  SS58 Address:     5CGNNpb4Jx9fefy68QTMoGm8vNBsXfsLhVp1t1Lb38CEkNBM
+  
+  
+ --- Subsequent Participants Join ---
+  
+  ./target/release/node-template \
+  --base-path /tmp/node02 \
+  --chain ./customSpecRaw.json \
+  --port 30334 \
+  --ws-port 9945 \
+  --rpc-port 9934 \
+  --telemetry-url 'wss://telemetry.polkadot.io/submit/ 0' \
+  --validator \
+  --rpc-methods Unsafe \
+  --name MyNode02 \
+  --bootnodes /ip4/127.0.0.1/tcp/30333/p2p/12D3KooWPkhToD2Sb14uaXosQ7u3jFzYvBZbPHFpUwrD4vq8sa1e

@@ -1,0 +1,10 @@
+{
+  "jsonrpc":"2.0",
+  "id":1,
+  "method":"author_insertKey",
+  "params": [
+    "aura",
+    "scrub clown hand shop split betray actress copper wish father gain lonely",
+    "0x72b4a81818e7c873bd7d399f3613e5518af2804a931a2b3e0187f94a196f9157"
+  ]
+}
