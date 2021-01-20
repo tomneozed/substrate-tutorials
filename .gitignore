@@ -14,3 +14,9 @@
 
 # The log files
 .log
+
+# front-end
+node_modules
+.vscode
+**/.DS_Store
+build
