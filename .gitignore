@@ -13,10 +13,5 @@
 .local
 
 # The log files
-.log
+*.log
 
-# front-end
-node_modules
-.vscode
-**/.DS_Store
-build
