@@ -341,7 +341,7 @@ impl pallet_node_authorization::Trait for Runtime {
     type SwapOrigin = EnsureRoot<AccountId>;
     type ResetOrigin = EnsureRoot<AccountId>;
     type WeightInfo = ();
-}
+}  
 
 parameter_types! {
 	pub const TransactionByteFee: Balance = 1;
@@ -365,6 +365,11 @@ impl pallet_template::Trait for Runtime {
 	type Event = Event;
 }
 
+// Test pallet impl [Subtrate tuto #8 : Write a pallet in its own crate]
+impl test_pallet::Trait for Runtime {
+	type Event = Event;
+  }
+
 // Create the runtime by composing the FRAME pallets that were previously configured.
 construct_runtime!(
 	pub enum Runtime where
@@ -386,6 +391,7 @@ construct_runtime!(
 		Scheduler: pallet_scheduler::{Module, Call, Storage, Event<T>},
 		Contracts: pallet_contracts::{Module, Call, Config, Storage, Event<T>},
 		NodeAuthorization: pallet_node_authorization::{Module, Call, Storage, Event<T>, Config<T>},
+		TestPallet: test_pallet::{Module, Call, Storage, Event<T>},
 	}
 );
 
