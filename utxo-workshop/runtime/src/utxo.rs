@@ -250,16 +250,73 @@ mod tests {
 	impl Trait for Test {
 		type Event = ();
 	}
-
+	
 	type Utxo = Module<Test>;
 
-	// fn new_test_ext() -> sp_io::TestExternalities {
-	// 	let mut t = system::GenesisConfig::default()
-	// 		.build_storage()
-	// 		.unwrap();
+	// need to manually import this crate since its no include by default
+	use hex_literal::hex;
+	
+	const ALICE_PHRASE: &str = "news slush supreme milk chapter athlete soap sausage put clutch what kitten";
+	const GENESIS_UTXO: [u8; 32] = hex!("79eabcbd5ef6e958c6a7851b36da07691c19bda1835a08f875aa286911800999");
+	
+	fn new_test_ext() -> sp_io::TestExternalities {
+		// 1. create keys for a test user : Alice
+		let keystore = KeyStore::new();
+		let alice_pub_key = keystore.write().sr25519_generate_new(SR25519, Some(ALICE_PHRASE)).unwrap();
+		
+		// 2. store a seed in genesis storage	
+		let mut t = system::GenesisConfig::default()
+			.build_storage::<Test>()
+			.unwrap();
+			
+		t.top.extend(
+			GenesisConfig {
+				genesis_utxos: vec! [
+					TransactionOutput {
+						value: 100,
+						pubkey: H256::from(alice_pub_key),
+					}
+				],
+				..Default::default()
+			}
+			.build_storage()
+			.unwrap()
+			.top,
+		);
+		let mut ext = sp_io::TestExternalities::from(t);
+		
+		// 3. Store Alice's keys in storage
+		ext.register_extension(KeystoreExt(keystore));
+		ext
+	}
 
-	// 	let mut ext = sp_io::TestExternalities::from(t);
-	// 	ext
-	// }
+	#[test]
+	fn test_simple_transaction() {
+		new_test_ext().execute_with(|| {
+			let alice_pub_key = sp_io::crypto::sr25519_public_keys(SR25519)[0];
 
+			let mut transaction = Transaction {
+				inputs: vec![TransactionInput {
+					outpoint: H256::from(GENESIS_UTXO),
+					sigscript: H512::zero(),
+				}],
+				outputs: vec![TransactionOutput {
+					value: 50,
+					pubkey: H256::from(alice_pub_key),
+				}],
+			};
+
+			let alice_signature = sp_io::crypto::sr25519_sign(SR25519, &alice_pub_key, &transaction.encode()).unwrap();
+			transaction.inputs[0].sigscript = H512::from(alice_signature);
+			let new_utxo_hash = BlakeTwo256::hash_of(&(&transaction.encode(), 0 as u64));
+
+			// 1. spend will be OK
+			assert_ok!(Utxo::spend(Origin::signed(0), transaction));
+			// 2. old UTXO is gone
+			assert!(! UtxoStore::contains_key(H256::from(GENESIS_UTXO)));
+			// 3. new UTXO will exist, value : 50
+			assert!(UtxoStore::contains_key(new_utxo_hash));
+			assert_eq!(50, UtxoStore::get(new_utxo_hash).unwrap().value);
+		});
+	}
 }
