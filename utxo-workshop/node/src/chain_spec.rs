@@ -68,6 +68,11 @@ impl Alternative {
 						get_account_id_from_seed::<sr25519::Public>("Alice//stash"),
 						get_account_id_from_seed::<sr25519::Public>("Bob//stash"),
 					],
+					// Gensis set of pubkeys that own UTXOs
+					vec![
+						get_from_seed::<sr25519::Public>("Alice"),
+						get_from_seed::<sr25519::Public>("Bob"),
+					],
 					true,
 				),
 				vec![],
@@ -99,6 +104,10 @@ impl Alternative {
 						get_account_id_from_seed::<sr25519::Public>("Eve//stash"),
 						get_account_id_from_seed::<sr25519::Public>("Ferdie//stash"),
 					],
+					vec![
+						get_from_seed::<sr25519::Public>("Alice"),
+						get_from_seed::<sr25519::Public>("Bob"),
+					],
 					true,
 				),
 				vec![],
@@ -123,6 +132,7 @@ fn testnet_genesis(
 	initial_authorities: Vec<(AuraId, GrandpaId)>,
 	root_key: AccountId,
 	endowed_accounts: Vec<AccountId>,
+	endowed_utxos: Vec<sr25519::Public>,
 	_enable_println: bool
 ) -> GenesisConfig {
 	
@@ -142,7 +152,18 @@ fn testnet_genesis(
 		}),
 		sudo: Some(SudoConfig {
 			key: root_key,
-		})
+		}),
+		utxo: Some(UtxoConfig {
+			genesis_utxos: endowed_utxos
+				.iter()
+				.map(|x| 
+					utxo::TransactionOutput {
+						value: 100 as utxo::Value,
+						pubkey: H256::from_slice(x.as_slice()),
+					}
+				)
+				.collect()
+		}),
 	}
 }
 

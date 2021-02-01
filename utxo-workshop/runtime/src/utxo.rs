@@ -63,9 +63,9 @@ decl_module! {
 		fn deposit_event() = default;
 
 		pub fn spend(_origin, transaction: Transaction) -> DispatchResult {
-			let reward = Self::validate_transaction(&transaction)?;
+			let valid_transaction = Self::validate_transaction(&transaction)?;
 			
-			Self::update_storage(&transaction, reward)?;
+			Self::update_storage(&transaction, valid_transaction.priority as Value)?;
 
 			// 3. emit success event
 			Self::deposit_event(Event::TransactionSuccess(transaction));
@@ -156,7 +156,7 @@ impl<T: Trait> Module<T> {
 		}
 	}
 
-	pub fn validate_transaction(transaction: &Transaction) -> Result<Value, &'static str> {
+	pub fn validate_transaction(transaction: &Transaction) -> Result<ValidTransaction, &'static str> {
 		ensure!(!transaction.inputs.is_empty(), "No inputs");
 		ensure!(!transaction.outputs.is_empty(), "No outputs");
 
@@ -175,6 +175,10 @@ impl<T: Trait> Module<T> {
 		let mut total_input: Value = 0;
 		let mut total_output: Value = 0;
 
+		let mut missing_utxos = Vec::new();
+		let mut new_utxos = Vec::new();
+		let mut reward = 0;
+
 		for input in transaction.inputs.iter() {
 			if let Some(input_utxo) = <UtxoStore>::get(&input.outpoint) {
 				ensure!( sp_io::crypto::sr25519_verify(
@@ -185,6 +189,7 @@ impl<T: Trait> Module<T> {
 				total_input = total_input.checked_add(input_utxo.value).ok_or("input value overflow")?;	
 			} else {
 				//TODO
+				missing_utxos.push(input.outpoint.clone().as_fixed_bytes().to_vec());
 			}
 		}
 
@@ -195,11 +200,21 @@ impl<T: Trait> Module<T> {
 			output_index = output_index.checked_add(1).ok_or("output index overflow")?;
 			ensure!(! <UtxoStore>::contains_key(hash), "output already exists");
 			total_output = total_output.checked_add(output.value).ok_or("output value overflow")?;
+			new_utxos.push(hash.as_fixed_bytes().to_vec());
 		}
-		ensure!( total_input >= total_output, "output value mustr not exceed input value");
-		let reward = total_input.checked_sub(total_output).ok_or("reward overflow")?;
 
-		Ok(reward)
+		if missing_utxos.is_empty() {
+			ensure!( total_input >= total_output, "output value mustr not exceed input value");
+			reward = total_input.checked_sub(total_output).ok_or("reward overflow")?;
+		}
+
+		Ok(ValidTransaction {
+			requires: missing_utxos,
+			provides: new_utxos,
+			priority: reward as u64,
+			longevity: TransactionLongevity::max_value(),
+			propagate: true,
+		})
 	}
 }
 
