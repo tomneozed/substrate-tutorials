@@ -272,8 +272,10 @@ mod tests {
 	use hex_literal::hex;
 	
 	const ALICE_PHRASE: &str = "news slush supreme milk chapter athlete soap sausage put clutch what kitten";
+	// other random account generated with subkey
+	const KARL_PHRASE: &str = "monitor exhibit resource stumble subject nut valid furnace obscure misery satoshi assume";
 	const GENESIS_UTXO: [u8; 32] = hex!("79eabcbd5ef6e958c6a7851b36da07691c19bda1835a08f875aa286911800999");
-	
+
 	fn new_test_ext() -> sp_io::TestExternalities {
 		// 1. create keys for a test user : Alice
 		let keystore = KeyStore::new();

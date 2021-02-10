@@ -4,7 +4,7 @@ build = 'build.rs'
 edition = '2018'
 homepage = 'https://substrate.dev'
 license = 'Unlicense'
-name = 'node-template'
+name = 'utxo-workshop'
 repository = 'https://github.com/paritytech/substrate/'
 version = '2.0.0-alpha.5'
 
